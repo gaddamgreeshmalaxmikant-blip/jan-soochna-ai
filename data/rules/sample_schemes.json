@@ -1,0 +1,131 @@
+{
+    "schemes": [
+        {
+            "scheme_id": "pm_kisan",
+            "name": "PM-KISAN Yojana",
+            "description": "Income support for small and marginal farmers",
+            "department": "Ministry of Agriculture",
+            "source_url": "https://pmkisan.gov.in",
+            "benefits": "₹6,000 per year in 3 installments",
+            "documents_required": ["Aadhaar", "Land records", "Bank account"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 60},
+                {"field": "annual_income", "operator": "<=", "value": 300000},
+                {"field": "land_owner", "operator": "==", "value": true}
+            ]
+        },
+        {
+            "scheme_id": "ayushman_bharat",
+            "name": "Ayushman Bharat Yojana",
+            "description": "Health insurance for poor families",
+            "department": "Ministry of Health",
+            "source_url": "https://pmjay.gov.in",
+            "benefits": "₹5,00,000 health insurance per family",
+            "documents_required": ["Aadhaar", "Ration card", "Bank account"],
+            "rules": [
+                {"field": "annual_income", "operator": "<=", "value": 250000},
+                {"field": "state", "operator": "in", "values": ["Maharashtra", "UP", "Bihar", "Rajasthan", "MP"]}
+            ]
+        },
+        {
+            "scheme_id": "pm_awas",
+            "name": "PM Awas Yojana",
+            "description": "Housing for all",
+            "department": "Ministry of Housing",
+            "source_url": "https://pmaymis.gov.in",
+            "benefits": "Financial assistance for house construction",
+            "documents_required": ["Aadhaar", "Income certificate", "Bank account"],
+            "rules": [
+                {"field": "annual_income", "operator": "<=", "value": 300000},
+                {"field": "land_owner", "operator": "==", "value": false}
+            ]
+        },
+        {
+            "scheme_id": "sukanya_samriddhi",
+            "name": "Sukanya Samriddhi Yojana",
+            "description": "Savings scheme for girl child",
+            "department": "Ministry of Finance",
+            "source_url": "https://www.india.gov.in",
+            "benefits": "High interest savings for girl child education",
+            "documents_required": ["Birth certificate", "Aadhaar", "Bank account"],
+            "rules": [
+                {"field": "gender", "operator": "==", "value": "Female"},
+                {"field": "age", "operator": "<=", "value": 10}
+            ]
+        },
+        {
+            "scheme_id": "pm_mudra",
+            "name": "PM Mudra Yojana",
+            "description": "Loans for small businesses",
+            "department": "Ministry of Finance",
+            "source_url": "https://www.mudra.org.in",
+            "benefits": "Loans up to ₹10 lakh for small businesses",
+            "documents_required": ["Aadhaar", "Business plan", "Bank account"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 65},
+                {"field": "occupation", "operator": "in", "values": ["Business", "Self-employed", "Trader"]}
+            ]
+        },
+        {
+            "scheme_id": "nsp_scholarship",
+            "name": "National Scholarship Portal",
+            "description": "Scholarships for students",
+            "department": "Ministry of Education",
+            "source_url": "https://scholarships.gov.in",
+            "benefits": "Financial assistance for education",
+            "documents_required": ["Aadhaar", "Income certificate", "Mark sheets"],
+            "rules": [
+                {"field": "annual_income", "operator": "<=", "value": 250000},
+                {"field": "occupation", "operator": "==", "value": "Student"}
+            ]
+        },
+        {
+            "scheme_id": "pm_jeevan_jyoti",
+            "name": "PM Jeevan Jyoti Bima Yojana",
+            "description": "Life insurance scheme",
+            "department": "Ministry of Finance",
+            "source_url": "https://www.jeevanjyoti.gov.in",
+            "benefits": "₹2 lakh life insurance coverage",
+            "documents_required": ["Aadhaar", "Bank account"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 50}
+            ]
+        },
+        {
+            "scheme_id": "pm_suraksha_bima",
+            "name": "PM Suraksha Bima Yojana",
+            "description": "Accident insurance scheme",
+            "department": "Ministry of Finance",
+            "source_url": "https://www.pmsuraksha.gov.in",
+            "benefits": "₹2 lakh accident insurance",
+            "documents_required": ["Aadhaar", "Bank account"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 70}
+            ]
+        },
+        {
+            "scheme_id": "atal_pension",
+            "name": "Atal Pension Yojana",
+            "description": "Pension scheme for unorganized sector",
+            "department": "Ministry of Finance",
+            "source_url": "https://www.npscra.nsdl.co.in",
+            "benefits": "₹1,000-5,000 monthly pension after 60",
+            "documents_required": ["Aadhaar", "Bank account"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 40}
+            ]
+        },
+        {
+            "scheme_id": "pm_kaushal_vikas",
+            "name": "PM Kaushal Vikas Yojana",
+            "description": "Skill development training",
+            "department": "Ministry of Skill Development",
+            "source_url": "https://www.pmkvyofficial.org",
+            "benefits": "Free skill training and certification",
+            "documents_required": ["Aadhaar", "Education certificate"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 15, "max": 45}
+            ]
+        }
+    ]
+}
