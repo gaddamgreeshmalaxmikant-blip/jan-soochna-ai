@@ -126,6 +126,136 @@
             "rules": [
                 {"field": "age", "operator": "between", "min": 15, "max": 45}
             ]
+        },
+                {
+            "scheme_id": "pm_fasal_bima",
+            "name": "PM Fasal Bima Yojana",
+            "description": "Crop insurance for farmers",
+            "department": "Ministry of Agriculture",
+            "source_url": "https://pmfby.gov.in",
+            "benefits": "Insurance coverage for crop loss",
+            "documents_required": ["Aadhaar", "Land records", "Bank account", "Crop details"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 70},
+                {"field": "land_owner", "operator": "==", "value": true}
+            ]
+        },
+        {
+            "scheme_id": "pm_kisan_maan_dhan",
+            "name": "PM Kisan Maan Dhan Yojana",
+            "description": "Pension for small farmers",
+            "department": "Ministry of Agriculture",
+            "source_url": "https://maandhan.in",
+            "benefits": "₹3,000 monthly pension after 60",
+            "documents_required": ["Aadhaar", "Land records", "Bank account"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 40},
+                {"field": "land_owner", "operator": "==", "value": true}
+            ]
+        },
+        {
+            "scheme_id": "beti_bachao",
+            "name": "Beti Bachao Beti Padhao",
+            "description": "Girl child education scheme",
+            "department": "Ministry of Women & Child Development",
+            "source_url": "https://wcd.nic.in",
+            "benefits": "Financial support for girl child education",
+            "documents_required": ["Birth certificate", "Aadhaar", "Bank account"],
+            "rules": [
+                {"field": "gender", "operator": "==", "value": "Female"},
+                {"field": "age", "operator": "<=", "value": 18}
+            ]
+        },
+        {
+            "scheme_id": "pm_matru_vandana",
+            "name": "PM Matru Vandana Yojana",
+            "description": "Maternity benefit scheme",
+            "department": "Ministry of Women & Child Development",
+            "source_url": "https://pmmvy.wcd.gov.in",
+            "benefits": "₹5,000 maternity benefit",
+            "documents_required": ["Aadhaar", "MCP card", "Bank account"],
+            "rules": [
+                {"field": "gender", "operator": "==", "value": "Female"},
+                {"field": "age", "operator": "between", "min": 19, "max": 45}
+            ]
+        },
+        {
+            "scheme_id": "pm_svanidhi",
+            "name": "PM SVANidhi",
+            "description": "Micro loans for street vendors",
+            "department": "Ministry of Housing",
+            "source_url": "https://pmsvanidhi.mohua.gov.in",
+            "benefits": "Working capital loans up to ₹50,000",
+            "documents_required": ["Aadhaar", "Vending certificate", "Bank account"],
+            "rules": [
+                {"field": "occupation", "operator": "in", "values": ["Street Vendor", "Vendor", "Hawker"]},
+                {"field": "age", "operator": "between", "min": 18, "max": 65}
+            ]
+        },
+        {
+            "scheme_id": "pm_vishwakarma",
+            "name": "PM Vishwakarma Yojana",
+            "description": "Support for artisans and craftspeople",
+            "department": "Ministry of MSME",
+            "source_url": "https://pmvishwakarma.gov.in",
+            "benefits": "Skill training, toolkit, and loans",
+            "documents_required": ["Aadhaar", "Bank account", "Trade certificate"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 60},
+                {"field": "occupation", "operator": "in", "values": ["Artisan", "Craftsman", "Carpenter", "Blacksmith", "Potter"]}
+            ]
+        },
+        {
+            "scheme_id": "pm_garib_kalyan",
+            "name": "PM Garib Kalyan Anna Yojana",
+            "description": "Free food grains for poor families",
+            "department": "Ministry of Consumer Affairs",
+            "source_url": "https://dfpd.gov.in",
+            "benefits": "Free 5kg food grains per person per month",
+            "documents_required": ["Ration card", "Aadhaar"],
+            "rules": [
+                {"field": "annual_income", "operator": "<=", "value": 100000}
+            ]
+        },
+        {
+            "scheme_id": "sc_st_scholarship",
+            "name": "SC/ST Scholarship",
+            "description": "Scholarship for SC/ST students",
+            "department": "Ministry of Social Justice",
+            "source_url": "https://scholarships.gov.in",
+            "benefits": "Tuition fee and maintenance allowance",
+            "documents_required": ["Caste certificate", "Income certificate", "Aadhaar", "Mark sheets"],
+            "rules": [
+                {"field": "occupation", "operator": "==", "value": "Student"},
+                {"field": "annual_income", "operator": "<=", "value": 250000}
+            ]
+        },
+        {
+            "scheme_id": "pm_shram_yogi",
+            "name": "PM Shram Yogi Maan Dhan",
+            "description": "Pension for unorganized workers",
+            "department": "Ministry of Labour",
+            "source_url": "https://maandhan.in",
+            "benefits": "₹3,000 monthly pension after 60",
+            "documents_required": ["Aadhaar", "Bank account"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 18, "max": 40},
+                {"field": "annual_income", "operator": "<=", "value": 180000}
+            ]
+        },
+        {
+            "scheme_id": "pm_kaushal_vikas_new",
+            "name": "PM Kaushal Vikas Yojana (New)",
+            "description": "Skill development training",
+            "department": "Ministry of Skill Development",
+            "source_url": "https://www.pmkvyofficial.org",
+            "benefits": "Free skill training and certification",
+            "documents_required": ["Aadhaar", "Education certificate"],
+            "rules": [
+                {"field": "age", "operator": "between", "min": 15, "max": 45}
+            ]
         }
     ]
 }
+        
+   
