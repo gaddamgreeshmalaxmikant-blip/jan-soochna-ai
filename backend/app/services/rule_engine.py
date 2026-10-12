@@ -22,7 +22,19 @@ class RuleEngine:
             return user_value != rule.value
         elif op == "in":
             return user_value in rule.values
+        elif op == "not_in":
+            return user_value not in rule.values
         return False
+    
+    def format_condition(self, rule) -> str:
+        if rule.operator == "between":
+            return f"{rule.field} between {rule.min} and {rule.max}"
+        elif rule.operator == "in":
+            return f"{rule.field} in {rule.values}"
+        elif rule.value is not None:
+            return f"{rule.field} {rule.operator} {rule.value}"
+        else:
+            return f"{rule.field} {rule.operator}"
     
     def check_eligibility(self, scheme: Scheme, user: UserProfile) -> Dict:
         results = []
@@ -36,7 +48,8 @@ class RuleEngine:
                     "field": rule.field,
                     "passed": False,
                     "reason": "Field not provided",
-                    "actual": None
+                    "actual": None,
+                    "condition": self.format_condition(rule)
                 })
                 continue
             
@@ -46,7 +59,7 @@ class RuleEngine:
             results.append({
                 "field": rule.field,
                 "passed": passed,
-                "condition": f"{rule.field} {rule.operator} {rule.value if rule.value else f'{rule.min}-{rule.max}'}",
+                "condition": self.format_condition(rule),
                 "actual": user_value
             })
         

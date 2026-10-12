@@ -11,64 +11,50 @@ class EmbeddingsService:
     - Category-based intent classification
     - Synonym expansion
     - Hybrid scoring (keyword + category)
-    - Re-ranking for relevance
     """
     
-    # ============================================================
-    # CATEGORY KEYWORD MAPPING (Intent Classification)
-    # ============================================================
     CATEGORY_KEYWORDS = {
         "agriculture": [
             "farmer", "crop", "crops", "farming", "farm", "agriculture",
             "kisan", "fasal", "harvest", "land", "soil", "irrigation",
-            "seeds", "fertilizer", "pesticide", "cattle", "dairy",
-            "livestock", "cultivation", "sowing", "reaping"
+            "seeds", "fertilizer", "pesticide", "cattle", "dairy"
         ],
         "education": [
             "student", "school", "college", "study", "education",
             "scholarship", "daughter", "son", "girl", "boy", "child",
-            "children", "academic", "university", "degree", "tuition",
-            "exam", "learning", "dropout", "literacy"
+            "academic", "university", "degree", "tuition", "exam"
         ],
         "health": [
             "health", "medical", "hospital", "insurance", "sick",
-            "illness", "medicine", "treatment", "surgery", "doctor",
-            "disease", "pregnancy", "maternity", "childbirth", "wellness"
+            "illness", "medicine", "treatment", "surgery", "doctor"
         ],
         "housing": [
-            "house", "home", "housing", "awas", "rent", "rental",
-            "shelter", "construction", "building", "roof", "land"
+            "house", "home", "housing", "awas", "rent",
+            "shelter", "construction", "building", "roof"
         ],
         "finance": [
             "money", "loan", "credit", "business", "income", "financial",
             "bank", "cash", "fund", "capital", "investment", "mudra",
-            "vendor", "shop", "small business", "entrepreneur", "startup"
+            "vendor", "shop", "small business", "entrepreneur"
         ],
         "pension": [
             "pension", "retirement", "old age", "elderly", "senior",
-            "senior citizen", "monthly pension", "annuity"
+            "senior citizen", "monthly pension"
         ],
         "women": [
             "women", "woman", "female", "wife", "mother", "widow",
-            "girl child", "beti", "maternity", "pregnancy", "mahila"
+            "girl child", "beti", "maternity", "pregnancy"
         ],
         "insurance": [
             "insurance", "life insurance", "accident", "death",
-            "disability", "coverage", "premium", "bima", "policy"
+            "disability", "coverage", "bima"
         ],
         "skill": [
             "skill", "training", "employment", "job", "unemployed",
-            "worker", "vocational", "kaushal", "apprentice", "craft"
-        ],
-        "employment": [
-            "job", "employment", "worker", "labor", "labour", "unemployed",
-            "mgnrega", "wage", "salary", "work"
+            "worker", "vocational", "kaushal"
         ]
     }
     
-    # ============================================================
-    # SYNONYM EXPANSION
-    # ============================================================
     SYNONYMS = {
         "crop": "farmer agriculture kisan fasal",
         "crops": "farmer agriculture kisan fasal",
@@ -115,14 +101,12 @@ class EmbeddingsService:
             data = json.load(f)
             self.schemes = data.get('schemes', [])
         
-        # Add category tags to each scheme
         for scheme in self.schemes:
             scheme['categories'] = self.detect_scheme_categories(scheme)
         
         print(f"✅ Loaded {len(self.schemes)} schemes")
     
     def detect_scheme_categories(self, scheme: dict) -> list:
-        """Detect categories for a scheme based on its text"""
         text = (
             f"{scheme.get('name', '')} "
             f"{scheme.get('description', '')} "
@@ -139,7 +123,6 @@ class EmbeddingsService:
         return matched
     
     def detect_query_categories(self, query: str) -> list:
-        """Detect categories from user query"""
         query_lower = query.lower()
         matched = []
         for category, keywords in self.CATEGORY_KEYWORDS.items():
@@ -201,36 +184,22 @@ class EmbeddingsService:
         print(f"✅ Built smart index with {len(self.schemes)} schemes")
     
     def hybrid_search(self, query: str, top_k: int = 5) -> list:
-        """
-        Hybrid search:
-        1. Expand query with synonyms
-        2. Match keywords (TF-IDF)
-        3. Detect categories
-        4. Re-rank with category boost
-        """
-        # Step 1: Expand query
         expanded_query = self.expand_query(query)
-        
-        # Step 2: TF-IDF similarity
         query_vec = self.vectorizer.transform([expanded_query])
         similarities = cosine_similarity(query_vec, self.tfidf_matrix).flatten()
         
-        # Step 3: Detect query categories
         query_categories = self.detect_query_categories(query)
         
-        # Step 4: Re-rank with category boost
         scored_results = []
         for idx, scheme in enumerate(self.schemes):
             base_score = float(similarities[idx])
             
-            # Category boost
             category_boost = 0.0
             if query_categories:
                 matched_cats = set(query_categories) & set(scheme.get('categories', []))
                 if matched_cats:
                     category_boost = 0.5 * len(matched_cats) / len(query_categories)
             
-            # Final score
             final_score = base_score + category_boost
             
             scored_results.append({
@@ -241,10 +210,8 @@ class EmbeddingsService:
                 'final_score': final_score
             })
         
-        # Sort by final score
         scored_results.sort(key=lambda x: x['final_score'], reverse=True)
         
-        # Build results
         results = []
         for r in scored_results[:top_k]:
             scheme = r['scheme'].copy()
@@ -257,7 +224,6 @@ class EmbeddingsService:
         return results
     
     def search(self, query: str, top_k: int = 5) -> list:
-        """Public search method — uses hybrid search"""
         return self.hybrid_search(query, top_k)
     
     def rebuild_index(self):

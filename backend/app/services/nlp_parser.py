@@ -39,18 +39,22 @@ class NLPParser:
                     profile["age"] = age
                     break
         
-        # ---------- Extract Income (improved) ----------
+        # ---------- Extract Income ----------
         income_patterns = [
             r'income\s+(?:of\s+)?(?:rs\.?\s*)?(\d+(?:\.\d+)?)\s*(lakh|lac|lakhs|lacs|k|thousand)?',
             r'(\d+(?:\.\d+)?)\s*(lakh|lac|lakhs|lacs)',
             r'earning\s+(?:rs\.?\s*)?(\d+(?:\.\d+)?)\s*(lakh|lac|lakhs|lacs|k|thousand)?',
             r'(?:rs\.?|₹)\s*(\d+(?:,\d+)*(?:\.\d+)?)',
+            r'(\d+(?:,\d+)+)',
         ]
         for pattern in income_patterns:
             income_match = re.search(pattern, text_lower)
             if income_match:
                 amount_str = income_match.group(1).replace(',', '')
-                amount = float(amount_str)
+                try:
+                    amount = float(amount_str)
+                except:
+                    continue
                 unit = income_match.group(2) if len(income_match.groups()) > 1 else None
                 
                 if unit in ["lakh", "lac", "lakhs", "lacs"]:
@@ -86,9 +90,12 @@ class NLPParser:
                 break
         
         # ---------- Extract Land Owner ----------
-        if "land owner" in text_lower or "landowner" in text_lower or "own land" in text_lower:
+        # If user mentions "farmer", assume they own land
+        if "farmer" in text_lower or "kisan" in text_lower or "agriculture" in text_lower:
             profile["land_owner"] = True
-        elif "no land" in text_lower or "don't own land" in text_lower:
+        elif "land owner" in text_lower or "landowner" in text_lower or "own land" in text_lower:
+            profile["land_owner"] = True
+        elif "no land" in text_lower or "don't own land" in text_lower or "landless" in text_lower:
             profile["land_owner"] = False
         
         return profile

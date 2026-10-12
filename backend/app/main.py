@@ -24,14 +24,8 @@ app.add_middleware(
 # ============================================================
 
 RULES_FILE = "data/rules/sample_schemes.json"
-
-# Rule Engine
 rule_engine = RuleEngine(RULES_FILE)
-
-# NLP Parser
 nlp_parser = NLPParser()
-
-# Embeddings Service (RAG)
 embeddings_service = EmbeddingsService(RULES_FILE)
 
 
@@ -64,7 +58,6 @@ async def health():
 
 @app.get("/api/schemes/count")
 async def scheme_count():
-    """Get total number of schemes loaded"""
     return {
         "total_schemes": len(rule_engine.schemes_data),
         "status": "success"
@@ -73,7 +66,6 @@ async def scheme_count():
 
 @app.get("/api/schemes/list")
 async def list_schemes():
-    """List all available schemes"""
     schemes = []
     for scheme in rule_engine.schemes_data:
         schemes.append({
@@ -81,10 +73,7 @@ async def list_schemes():
             "name": scheme.get("name"),
             "department": scheme.get("department")
         })
-    return {
-        "total": len(schemes),
-        "schemes": schemes
-    }
+    return {"total": len(schemes), "schemes": schemes}
 
 
 # ============================================================
@@ -93,7 +82,6 @@ async def list_schemes():
 
 @app.post("/api/check-eligibility")
 async def check_eligibility(user: UserProfile):
-    """Check eligibility for ALL schemes (structured input)"""
     try:
         eligible = rule_engine.find_eligible_schemes(user)
         return {
@@ -108,7 +96,6 @@ async def check_eligibility(user: UserProfile):
 
 @app.post("/api/check-scheme/{scheme_id}")
 async def check_specific_scheme(scheme_id: str, user: UserProfile):
-    """Check eligibility for a SPECIFIC scheme"""
     try:
         for scheme_data in rule_engine.schemes_data:
             if scheme_data.get('scheme_id') == scheme_id:
@@ -133,12 +120,6 @@ async def check_specific_scheme(scheme_id: str, user: UserProfile):
 
 @app.post("/api/parse-query")
 async def parse_natural_language(request: NaturalLanguageQuery):
-    """
-    Parse natural language query into structured profile.
-    
-    Example: "I am a 45 year old farmer from Maharashtra earning 2.5 lakh"
-    Returns: {"age": 45, "annual_income": 250000, "state": "Maharashtra", "occupation": "Farmer"}
-    """
     try:
         profile = nlp_parser.parse(request.query)
         return {
@@ -152,25 +133,17 @@ async def parse_natural_language(request: NaturalLanguageQuery):
 
 @app.post("/api/smart-check")
 async def smart_check(request: NaturalLanguageQuery):
-    """
-    Parse natural language query AND check eligibility in one call.
-    
-    Example: "I am a 45 year old farmer from Maharashtra earning 2.5 lakh"
-    Returns: Extracted profile + Eligible schemes
-    """
     try:
         profile_dict = nlp_parser.parse(request.query)
         
         if not profile_dict.get("age") or not profile_dict.get("annual_income"):
             return {
                 "status": "incomplete",
-                "message": "Could not extract age or income. Please provide more details.",
+                "message": "Could not extract age or income.",
                 "extracted_profile": profile_dict
             }
         
-        # Fill default state if missing
         profile_dict.setdefault("state", "Maharashtra")
-        
         user = UserProfile(**profile_dict)
         eligible = rule_engine.find_eligible_schemes(user)
         
@@ -191,12 +164,6 @@ async def smart_check(request: NaturalLanguageQuery):
 
 @app.post("/api/semantic-search")
 async def semantic_search(request: SearchQuery):
-    """
-    Semantic search using RAG (Retrieval-Augmented Generation).
-    
-    Example: "I need help for my crops"
-    Returns: Most relevant schemes based on meaning, not keywords
-    """
     try:
         results = embeddings_service.search(request.query, request.top_k)
         return {
@@ -211,20 +178,14 @@ async def semantic_search(request: SearchQuery):
 
 @app.post("/api/smart-search")
 async def smart_search(request: SearchQuery):
-    """
-    Combined search: NLP parsing + Semantic search + Eligibility check.
-    
-    Example: "I am a 45 year old farmer from Maharashtra earning 2.5 lakh"
-    Returns: Extracted profile + Relevant schemes + Eligibility status
-    """
     try:
         # Step 1: Parse natural language
         profile_dict = nlp_parser.parse(request.query)
         
-        # Step 2: Semantic search for relevant schemes
+        # Step 2: Semantic search
         search_results = embeddings_service.search(request.query, request.top_k)
         
-        # Step 3: Check eligibility if profile is complete
+        # Step 3: Check eligibility
         eligibility_results = []
         if profile_dict.get("age") and profile_dict.get("annual_income"):
             profile_dict.setdefault("state", "Maharashtra")
@@ -232,15 +193,20 @@ async def smart_search(request: SearchQuery):
             
             for scheme_data in search_results:
                 from .models.scheme import Scheme
-                # Remove similarity_score before creating Scheme object
                 scheme_clean = {
                     k: v for k, v in scheme_data.items() 
-                    if k != 'similarity_score'
+                    if k not in ['similarity_score', 'categories', 'matched_categories']
                 }
                 scheme = Scheme(**scheme_clean)
                 result = rule_engine.check_eligibility(scheme, user)
                 result['similarity_score'] = scheme_data.get('similarity_score', 0)
                 eligibility_results.append(result)
+            
+            # NEW: Sort eligible first, then by similarity
+            eligibility_results.sort(
+                key=lambda x: (x.get('eligible', False), x.get('similarity_score', 0)),
+                reverse=True
+            )
         
         return {
             "status": "success",
@@ -251,7 +217,8 @@ async def smart_search(request: SearchQuery):
                     "scheme_id": s.get("scheme_id"),
                     "name": s.get("name"),
                     "description": s.get("description"),
-                    "similarity_score": s.get("similarity_score")
+                    "similarity_score": s.get("similarity_score"),
+                    "matched_categories": s.get("matched_categories", [])
                 }
                 for s in search_results
             ],
@@ -263,7 +230,6 @@ async def smart_search(request: SearchQuery):
 
 @app.post("/api/rebuild-index")
 async def rebuild_index():
-    """Rebuild the RAG index (call when schemes are updated)"""
     try:
         embeddings_service.rebuild_index()
         return {
